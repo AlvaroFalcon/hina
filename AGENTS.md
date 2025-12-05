@@ -101,12 +101,14 @@ app/
 - Use Prettier for code formatting
 - Configuration should be in `.prettierrc` or `package.json`
 - Format on save recommended
-- Run `pnpm format` before committing
+- **Do NOT run Prettier automatically after changes** - only run `pnpm format` when explicitly requested by the user
+- Run `pnpm format` before committing (user's responsibility)
 
 ## Linter
 
 - ESLint is configured with Next.js presets
-- Run `pnpm lint` before committing
+- **Do NOT run ESLint automatically after changes** - only run `pnpm lint` when explicitly requested by the user
+- Run `pnpm lint` before committing (user's responsibility)
 - Fix auto-fixable issues: `pnpm lint --fix`
 - TypeScript strict mode is enabled - fix all type errors
 
@@ -144,7 +146,8 @@ app/
   ```
 - Use Vitest or Jest (prefer Vitest for Next.js projects)
 - Test coverage should be maintained
-- Run `pnpm test` before committing
+- **Do NOT run tests automatically after changes** - only run `pnpm test` when explicitly requested by the user
+- Run `pnpm test` before committing (user's responsibility)
 - This structure makes it easy to locate tests quickly by mirroring the source code organization
 
 ## Database & Backend
@@ -169,8 +172,8 @@ app/
 ## Commit Guidelines
 
 - Use conventional commits format
-- Run `pnpm lint` and `pnpm test` before committing
-- Format code with Prettier before committing
+- Run `pnpm lint` and `pnpm test` before committing (user's responsibility)
+- Format code with Prettier before committing (user's responsibility)
 - Keep commits focused and atomic
 
 ## File Organization
