@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Character {
+  id        String        @id @default(uuid())
+  character String
+  reading   String
+  type      CharacterType
+  order     Int
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("characters")
+}
+
+model Module {
+  id            String   @id @default(uuid())
+  name          String
+  characterList String[] // Array of character IDs
+  order         Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userProgress UserProgress[]
+
+  @@map("modules")
+}
+
+model UserProgress {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  moduleId   String   @map("module_id")
+  percentage Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+  @@map("user_progress")
+}
+
+enum CharacterType {
+  HIRAGANA
+  KATAKANA
+
+  @@map("character_type")
+}
