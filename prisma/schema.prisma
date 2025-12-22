@@ -2,7 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  engineType    = "binary"
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -18,20 +20,38 @@ model Character {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
+  moduleCharacters ModuleCharacter[]
+
   @@map("characters")
 }
 
 model Module {
-  id            String   @id @default(uuid())
-  name          String
-  characterList String[] // Array of character IDs
-  order         Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  userProgress UserProgress[]
+  moduleCharacters ModuleCharacter[]
+  userProgress     UserProgress[]
 
   @@map("modules")
+}
+
+model ModuleCharacter {
+  id          String   @id @default(uuid())
+  moduleId    String   @map("module_id")
+  characterId String   @map("character_id")
+  order       Int
+  updatedAt   DateTime @updatedAt
+
+  module    Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([moduleId, characterId])
+  @@index([moduleId])
+  @@index([characterId])
+  @@map("module_characters")
 }
 
 model UserProgress {
