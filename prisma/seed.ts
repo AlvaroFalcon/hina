@@ -1,6 +1,27 @@
+import { config } from "dotenv";
 import { PrismaClient, CharacterType } from "@prisma/client";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+// Load environment variables from .env
+config({ path: ".env" });
+
+/**
+ * Creates a Prisma client for seeding with PostgreSQL adapter.
+ */
+function createSeedClient(): PrismaClient {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL environment variable is not defined");
+  }
+
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaPg(pool);
+
+  return new PrismaClient({ adapter });
+}
+
+const prisma = createSeedClient();
 
 /**
  * Seed script to populate the database with minimal required data.

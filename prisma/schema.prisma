@@ -15,24 +15,30 @@ model Character {
   reading   String
   type      CharacterType
   order     Int
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
 
-  moduleCharacters ModuleCharacter[]
+  moduleCharacters   ModuleCharacter[]
+  quizAnswers        QuizAnswer[]
+  userCharacterStats UserCharacterStats[]
 
+  @@unique([character, type])
   @@map("characters")
 }
 
 model Module {
-  id        String   @id @default(uuid())
-  name      String
-  order     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  order       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   moduleCharacters ModuleCharacter[]
   userProgress     UserProgress[]
+  quizSessions     QuizSession[]
 
+  @@unique([order])
   @@map("modules")
 }
 
@@ -41,7 +47,8 @@ model ModuleCharacter {
   moduleId    String   @map("module_id")
   characterId String   @map("character_id")
   order       Int
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   module    Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
@@ -56,13 +63,14 @@ model UserProgress {
   id         String   @id @default(uuid())
   userId     String   @map("user_id")
   moduleId   String   @map("module_id")
-  percentage Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  percentage Float    @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, moduleId])
+  @@index([userId])
   @@map("user_progress")
 }
 
@@ -71,4 +79,74 @@ enum CharacterType {
   KATAKANA
 
   @@map("character_type")
+}
+
+// ============================================
+// Quiz System Tables
+// ============================================
+
+/**
+ * A quiz session represents one complete quiz attempt by a user.
+ * Tracks overall performance and timing.
+ */
+model QuizSession {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  moduleId    String    @map("module_id")
+  score       Int       @default(0)
+  totalItems  Int       @map("total_items")
+  startedAt   DateTime  @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  module  Module       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  answers QuizAnswer[]
+
+  @@index([userId])
+  @@index([moduleId])
+  @@index([userId, moduleId])
+  @@map("quiz_sessions")
+}
+
+/**
+ * Individual answer within a quiz session.
+ * Tracks user response, correctness, and response time for analytics.
+ */
+model QuizAnswer {
+  id             String   @id @default(uuid())
+  sessionId      String   @map("session_id")
+  characterId    String   @map("character_id")
+  userAnswer     String   @map("user_answer")
+  isCorrect      Boolean  @map("is_correct")
+  responseTimeMs Int?     @map("response_time_ms")
+  answeredAt     DateTime @default(now()) @map("answered_at")
+
+  session   QuizSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  character Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([characterId])
+  @@map("quiz_answers")
+}
+
+/**
+ * Aggregated statistics per character per user.
+ * Used for adaptive quiz algorithm to prioritize weak characters.
+ */
+model UserCharacterStats {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  characterId   String    @map("character_id")
+  totalAttempts Int       @default(0) @map("total_attempts")
+  correctCount  Int       @default(0) @map("correct_count")
+  streakCount   Int       @default(0) @map("streak_count")
+  lastAttemptAt DateTime? @map("last_attempt_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, characterId])
+  @@index([userId])
+  @@index([characterId])
+  @@map("user_character_stats")
 }
