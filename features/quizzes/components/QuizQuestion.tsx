@@ -125,15 +125,15 @@ export function QuizQuestion({
       {showFeedback && (
         <div
           className={`mt-6 text-center text-xl font-bold ${
-            showFeedback.isCorrect ? "text-foreground" : "text-destructive"
+            showFeedback.isCorrect ? "text-green-600" : "text-red-600"
           }`}
         >
           {showFeedback.isCorrect ? (
-            <span className="onomatopoeia">¡Correcto!</span>
+            <span>¡Correcto!</span>
           ) : (
             <span>
               Incorrecto. Era:{" "}
-              <span className="underline">{showFeedback.correctAnswer}</span>
+              <span className="font-black">{showFeedback.correctAnswer}</span>
             </span>
           )}
         </div>
