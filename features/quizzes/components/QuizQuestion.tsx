@@ -76,13 +76,16 @@ export function QuizQuestion({
       return "bg-background hover:bg-secondary/50 hover:manga-shadow-sm";
     }
 
-    // With feedback
+    // With feedback - correct answer always shown in green
     if (option === showFeedback.correctAnswer) {
-      return "bg-foreground text-background manga-shadow";
+      return "bg-green-500 text-white manga-shadow";
     }
+
+    // User's wrong selection shown in red
     if (selectedAnswer === option && !showFeedback.isCorrect) {
-      return "bg-destructive/20 line-through opacity-60";
+      return "bg-red-500 text-white";
     }
+
     return "opacity-40";
   };
 
