@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { UserProgress } from "@prisma/client";
 import type { ModuleWithProgress, ProgressSummary } from "../types";
 
 /** Minimum percentage required to unlock the next module */
@@ -32,7 +33,7 @@ export async function getModulesWithProgress(
 
   // Create a map for quick lookup
   const progressMap = new Map(
-    userProgress.map((p) => [p.moduleId, p.percentage])
+    userProgress.map((p: UserProgress) => [p.moduleId, p.percentage])
   );
 
   // Determine current module (first incomplete unlocked module)
@@ -53,8 +54,7 @@ export async function getModulesWithProgress(
       }
 
       // Current module is the first unlocked but not completed
-      const isCurrent =
-        isUnlocked && !isCompleted && currentModuleId === null;
+      const isCurrent = isUnlocked && !isCompleted && currentModuleId === null;
       if (isCurrent) {
         currentModuleId = module.id;
       }
