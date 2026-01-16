@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { getUser } from "@/features/auth/lib/get-user";
+import { Navbar } from "@/components/navbar";
 
 /**
  * Landing page component for Hina.
@@ -7,32 +8,11 @@ import { ThemeToggle } from "@/components/theme-toggle";
  * features overview, and call-to-action buttons.
  * @returns The landing page JSX element
  */
-export default function Home() {
+export default async function Home() {
+  const user = await getUser();
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="text-2xl font-black tracking-tighter">
-            ひな
-          </Link>
-          <nav className="flex items-center gap-2 sm:gap-4">
-            <ThemeToggle />
-            <Link
-              href="/login"
-              className="px-3 py-2 text-sm font-semibold transition-colors hover:text-muted-foreground sm:px-4"
-            >
-              Entrar
-            </Link>
-            <Link
-              href="/register"
-              className="manga-btn bg-primary px-4 py-2 text-sm font-bold text-primary-foreground sm:px-6"
-            >
-              Empezar
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <Navbar variant="fixed" user={user} />
 
       {/* Hero Section */}
       <main className="pt-16">

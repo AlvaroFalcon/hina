@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getUser } from "@/features/auth/lib/get-user";
 import {
   getModulesWithProgress,
   CurrentModuleCard,
   ModuleGrid,
 } from "@/features/modules";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Navbar } from "@/components/navbar";
 
 /** Force dynamic rendering to avoid static generation with DB calls */
 export const dynamic = "force-dynamic";
@@ -27,26 +26,21 @@ export default async function DashboardPage() {
   const modules = await getModulesWithProgress(user.id);
   const currentModule = modules.find((m) => m.isCurrent) ?? null;
   const completedCount = modules.filter((m) => m.isCompleted).length;
-  const isAllCompleted = completedCount === modules.length && modules.length > 0;
+  const isAllCompleted =
+    completedCount === modules.length && modules.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b-4 border-foreground">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="text-2xl font-black tracking-tighter">
-            ひな
-          </Link>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <div className="manga-border bg-secondary px-3 py-1">
-              <span className="text-sm font-bold">
-                {completedCount}/{modules.length}
-              </span>
-            </div>
+      <Navbar
+        user={user}
+        rightSlot={
+          <div className="manga-border bg-secondary px-3 py-1">
+            <span className="text-sm font-bold">
+              {completedCount}/{modules.length}
+            </span>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         {/* Welcome section */}

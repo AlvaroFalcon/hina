@@ -192,6 +192,7 @@ export function QuizContainer({ initialSession }: QuizContainerProps) {
 
       {currentQuestion && (
         <QuizQuestion
+          key={currentIndex}
           question={currentQuestion}
           onAnswer={handleAnswer}
           disabled={state !== "playing"}

@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getUser } from "@/features/auth/lib/get-user";
 import { getModulesWithProgress } from "@/features/modules";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Navbar } from "@/components/navbar";
 
 /** Force dynamic rendering */
 export const dynamic = "force-dynamic";
@@ -38,16 +38,15 @@ export default async function ModulePage({ params }: ModulePageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b-4 border-foreground">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
+      <Navbar
+        user={user}
+        leftContent={
           <Link href="/dashboard" className="flex items-center gap-2 font-bold">
             <span className="text-xl">&larr;</span>
             <span>Volver</span>
           </Link>
-          <ThemeToggle />
-        </div>
-      </header>
+        }
+      />
 
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         {/* Module header */}

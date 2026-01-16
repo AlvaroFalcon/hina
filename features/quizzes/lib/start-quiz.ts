@@ -101,24 +101,36 @@ function calculateCharacterWeights(
 /**
  * Selects characters for the quiz using adaptive algorithm.
  * Prioritizes characters the user struggles with.
+ * Allows repetitions when there are fewer characters than requested questions,
+ * prioritizing weak characters for repetition.
  * @param weightedCharacters - Characters with weights
  * @param count - Number of characters to select
- * @returns Selected characters for the quiz
+ * @returns Selected characters for the quiz (may contain duplicates)
  */
 function selectAdaptiveCharacters(
   weightedCharacters: WeightedCharacter[],
   count: number
 ): QuizCharacter[] {
   const selected: QuizCharacter[] = [];
-  const available = [...weightedCharacters];
 
-  while (selected.length < count && available.length > 0) {
-    const chosen = weightedRandomSelect(available);
+  // First pass: include each character at least once (up to count)
+  const firstPass = [...weightedCharacters];
+  while (selected.length < count && firstPass.length > 0) {
+    const chosen = weightedRandomSelect(firstPass);
     selected.push(chosen.character);
 
-    // Remove selected character from available pool
-    const index = available.indexOf(chosen);
-    available.splice(index, 1);
+    // Remove selected character from first pass pool
+    const index = firstPass.indexOf(chosen);
+    firstPass.splice(index, 1);
+  }
+
+  // Second pass: if we need more questions, allow repetitions
+  // Characters with higher weights (lower accuracy) are more likely to repeat
+  if (selected.length < count && weightedCharacters.length > 0) {
+    while (selected.length < count) {
+      const chosen = weightedRandomSelect(weightedCharacters);
+      selected.push(chosen.character);
+    }
   }
 
   return selected;
@@ -218,10 +230,10 @@ export async function startQuiz(
     config
   );
 
-  const questionCount = Math.min(config.questionCount, characters.length);
+  // Allow questionCount even if it exceeds character count (repetitions allowed)
   const selectedCharacters = selectAdaptiveCharacters(
     weightedCharacters,
-    questionCount
+    config.questionCount
   );
 
   // Get all unique readings for generating options
