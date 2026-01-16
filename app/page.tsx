@@ -42,7 +42,7 @@ export default async function Home() {
 
               {/* Headline */}
               <h1 className="mb-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl md:text-6xl">
-                Aprende japonés
+                Aprende los silabarios
                 <br />
                 <span className="relative inline-block">
                   desde cero
